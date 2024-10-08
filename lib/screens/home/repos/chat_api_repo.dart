@@ -3,7 +3,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:dio/dio.dart';
 
 class ChatApiRepo {
-  static ChatApiResponseGeneration(List<ChatApiGemini> previousMessages) async {
+  static Future<String> ChatApiResponseGeneration(
+      List<ChatApiGemini> previousMessages) async {
     final String apiKey = dotenv.env['API_KEY'] ?? '';
 
     String url =
@@ -26,9 +27,16 @@ class ChatApiRepo {
           "responseMimeType": "text/plain"
         }
       });
-      print(response);
+
+      if (response.statusCode! >= 200 && response.statusCode! <= 300) {
+        String modelResponse =
+            response.data["candidates"].first["content"]["parts"].first["text"];
+        return modelResponse;
+      }
+      return '';
     } catch (e) {
       print(e);
+      return '';
     }
   }
 }

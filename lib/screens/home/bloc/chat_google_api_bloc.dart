@@ -15,6 +15,7 @@ class ChatGoogleApiBloc extends Bloc<ChatGoogleApiEvent, ChatGoogleApiState> {
   }
 
   List<ChatApiGemini> messages = [];
+  bool generating = false;
 
   FutureOr<void> chatGoogleApiIntialEvent(
       ChatGoogleApiIntialEvent event, Emitter<ChatGoogleApiState> emit) {
@@ -26,6 +27,14 @@ class ChatGoogleApiBloc extends Bloc<ChatGoogleApiEvent, ChatGoogleApiState> {
     messages.add(ChatApiGemini(
         role: "user", parts: [ChatApiPartModel(text: event.messagePrompt)]));
     emit(ChatGoogleApiSuccessState(messages: messages));
-    await ChatApiRepo.ChatApiResponseGeneration(messages);
+    generating = true;
+    String modelMessage = await ChatApiRepo.ChatApiResponseGeneration(messages);
+    if (modelMessage != '') {
+      messages.add(ChatApiGemini(
+          role: "model", parts: [ChatApiPartModel(text: modelMessage)]));
+      generating = false;
+      emit(ChatGoogleApiSuccessState(messages: messages));
+    }
+    generating = false;
   }
 }

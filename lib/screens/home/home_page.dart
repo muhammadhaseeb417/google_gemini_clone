@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_gemini_clone/screens/home/bloc/chat_google_api_bloc.dart';
 import 'package:google_gemini_clone/screens/home/widgets/container.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -87,8 +88,37 @@ class _HomePageState extends State<HomePage> {
                     final messages = state.messages;
                     return ListView.builder(
                       padding: const EdgeInsets.all(15),
-                      itemCount: messages.length,
+                      // Add one more item if generating (for shimmer)
+                      itemCount: messages.length +
+                          (context.read<ChatGoogleApiBloc>().generating
+                              ? 1
+                              : 0),
                       itemBuilder: (context, index) {
+                        // If we're at the last index and generating is true, show shimmer
+                        if (index == messages.length &&
+                            context.read<ChatGoogleApiBloc>().generating) {
+                          return Shimmer.fromColors(
+                            baseColor: Colors.grey.shade800,
+                            highlightColor: Colors.grey.shade500,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                height: 50,
+                                width: MediaQuery.of(context).size.width * 0.7,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: const BorderRadius.only(
+                                    bottomLeft: Radius.circular(15),
+                                    bottomRight: Radius.circular(15),
+                                    topRight: Radius.circular(15),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
+                        // Align user and model messages correctly
                         return Align(
                           alignment: messages[index].role == "user"
                               ? Alignment.centerRight
