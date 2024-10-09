@@ -51,6 +51,7 @@ dev_dependencies:
   dio: ^5.7.0
   flutter_dotenv: ^5.1.0
   shimmer: ^3.0.0
+  device_preview: ^1.2.0
 
 
 # For information on the generic Dart part of this file, see the
